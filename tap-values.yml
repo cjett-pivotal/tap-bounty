@@ -1,0 +1,67 @@
+profile: full
+ceip_policy_disclosed: true # Installation fails if this is set to 'false'
+buildservice:
+  kp_default_repository: "GCR_REPOSITORY"
+  kp_default_repository_username: _json_key
+  kp_default_repository_password: |
+    {
+    SERVICE_ACCOUNT_JSON
+    }
+  tanzunet_username: "TANZU_NETWORK_USERNAME"
+  tanzunet_password: "TANZU_NETWORK_PASSWORD"
+
+supply_chain: basic
+
+ootb_supply_chain_basic:
+  registry:
+    server: "gcr.io"
+    repository: "GCR_REPOSITORY"
+  gitops:
+    ssh_secret: ""
+
+#learningcenter:
+#  ingressDomain: "educates.tanzu4u.net"
+
+metadata_store:
+  app_service_type: LoadBalancer # (optional) Defaults to LoadBalancer. Change to NodePort for distributions that don't support LoadBalancer
+
+grype:
+  namespace: dev # (optional) Defaults to default namespace.
+  targetImagePullSecret: registry-credentials
+
+contour:
+  envoy:
+    service:
+      type: LoadBalancer
+
+tap_gui:
+  namespace: tap-gui
+  service_type: ClusterIP
+  app_config:
+    app:
+      baseUrl: https://tap-gui.tap.tanzu4u.net  # DNS Suffix should match 'domain' in values-ingress.yaml
+    integrations:
+      github: # Other integrations available see NOTE below
+        - host: github.com
+          token: GITHUB_TOKEN
+    catalog:
+      locations:
+        - type: url
+          target: https://github.com/sreeramsunkara/tap-catalogs/blob/11c415bf150ea25a8195518381499c4ac8e50dbf/blank/catalog-info.yaml
+    backend:
+        baseUrl: https://tap-gui.tap.tanzu4u.net
+        cors:
+          origin: https://tap-gui.tap.tanzu4u.net
+
+learningcenter:
+  ingressDomain: "tap.tanzu4u.net"             # Should match 'domain' in values-ingress.yaml
+  ingressSecret:
+    secretName: tls                            # Should match 'tls.secretName' in values-ingress.yaml
+  server:
+    service_type: ClusterIP
+
+cnrs:
+ default_tls_secret: tanzu-system-ingress/tls
+ domain_name: apps.tap.tanzu4u.net
+ domain_template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
+

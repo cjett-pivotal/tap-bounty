@@ -1,0 +1,6 @@
+#@data/values
+---
+domain: tap.tanzu4u.net
+tls:
+  secretName: tls
+  namespace: tanzu-system-ingress

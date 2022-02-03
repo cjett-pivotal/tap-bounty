@@ -1,0 +1,4 @@
+#@ load("@ytt:data", "data")
+
+data:
+  key: #@ "{}: \"\"".format(data.values.domain)
