@@ -1,7 +1,7 @@
 # tap-bounty
-TAP Installation on GCP
-Use the jupyter notebook jupyter/tap-install.ipyn to install TAP following the instructions.
-Postgres Operator Installation
-Use the jupyter notebook jupyter/tap-install.ipyn to install Postgres Operator on TAP following the instructions.
-Deploy Spring Petclinic App and bind to Postgres database
-Use the jupyter notebook jupyter/tap-install.ipyn to install Postgres Operator on TAP following the instructions.
+#TAP Installation on GCP
+##Use the jupyter notebook jupyter/tap-install.ipyn to install TAP following the instructions.
+#Postgres Operator Installation
+##Use the jupyter notebook jupyter/tap-install.ipyn to install Postgres Operator on TAP following the instructions.
+#Deploy Spring Petclinic App and bind to Postgres database
+##Use the jupyter notebook jupyter/tap-install.ipyn to install Postgres Operator on TAP following the instructions.
