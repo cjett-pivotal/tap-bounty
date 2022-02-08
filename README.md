@@ -8,7 +8,7 @@
 
 ## TAP Installation on GKE
 ###Prerequisites:
->Note: 
+>Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install-prerequistes.ipynb">jupyter/tap-install-prerequisites.ipynb</a> to install prerequisites for installing TAP.
 - GKE Cluster with the following configuration:
   - cluster-version "1.21.6-gke.1500" or above
   - machine-type "e2-standard-4"
