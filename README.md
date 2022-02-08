@@ -57,11 +57,112 @@
 - Install or update the Tanzu CLI and plug-ins
   - Follow the instructions provided in the VMware Documentation to install <a href="https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#install-or-update-the-tanzu-cli-and-plugins-2">Tanzu CLI and plug-ins</a>
 
-###Installing Tanzu Application Platform:
+### Installing Tanzu Application Platform:
+>Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipynb</a> to install Tanzu Application Platform.
+> If you are unable to run notebook, follow the instructions below.
+- Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/install/scripts/setUp.sh">setUp.sh</a> and update values forI INSTALL_REGISTRY_HOSTNAME, INSTALL_REGISTRY_USERNAME, INSTALL_REGISTRY_PASSWORD, CERTS_DIR, SA_PWD_FILE
 
+  - INSTALL_REGISTRY_HOSTNAME - registry.tanzu.vmware.com
+  - INSTALL_REGISTRY_USERNAME - your Tanzu registry username
+  - INSTALL_REGISTRY_PASSWORD - your Tanzu registry password
+  - CERTS_DIR - the directory that holds the ssl certs(public and private keys) in .pem format to use in configuring SSL for ingress.
+  - SA_PWD_FILE - your GCP Service Account key in json format in a file.
 
-## Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipyn</a> to install TAP following the instructions.
-# Postgres Operator Installation
+  ```bash
+  cd $HOME/projects/tap-bounty/install/scripts
+  chmod 755 setUp.sh
+  cd $HOME/projects/tap-bounty
+  ```
+  - Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/tap-values.yml">tap-values.yml</a> to update the values for GCR_REPOSITORY, SERVICE_ACCOUNT_JSON, TANZU_NETWORK_USERNAME, TANZU_NETWORK_PASSWORD, GITHUB_TOKEN and the domain values.
+  
+    - GCR_REPOSITORY - gcr.io/PROJECT_ID/REPO_NAME
+    - SERVICE_ACCOUNT_JSON - Service Account json to access GCP
+    - TANZU_NETWORK_USERNAME - your Tanzu network username
+    - TANZU_NETWORK_PASSWORD - your Tanzu network password
+    - GITHUB_TOKEN - GitHub access token
+    ```bash
+    tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values.yml -n tap-install
+    ```
+    >Note: If the status shows reconciliation failed for TAP, it may be due to the GKE control plane issue mentioned before. Check the GKE console to view the workloads and their status. If you see errors or warnings such as rebuilding cluster or information about nodes/cluster unavailable, then it means that we have to delete the TAP installation and reinstall again. Check Re-installation instructions below.
+
+- Check the status of the TAP installation 
+  ```bash
+  tanzu package installed get tap -n tap-install
+  ```
+- If the status is success, then check all the packages installed.
+  ```bash
+  tanzu package installed list -A
+  ```
+- In case of failure, use the following instructions
+  - Check the error message for individual package by executing the following command using the information from the List command above.
+    ```bash
+    tanzu package installed get "name of the package" -n "namespace in which it is installed"
+    ```
+  - Typical issues are invalid values in tap-values.yml. Doublecheck the values and reinstall again.
+- Re-installation in case of failures
+  - Delete TAP installation by running the following command.
+  ```bash
+  tanzu package installed delete tap -n tap-install
+  ```
+  - Install TAP again
+  ```bash
+    tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values.yml -n tap-install
+  ```
+>Note: If you see errors in GKE console and if the delete command fails, retry again after the GKE cluster is available.
+
+- Configure Ingress and Routing
+   
+  - Note the external ip address associated with the load balancer.
+  ```bash
+  kubectl get svc envoy -n tanzu-system-ingress
+  ```
+  - If you are using a custom domain with Google Cloud DNS, create the DNS records with the ip address noted from above command.
+  ```bash
+  gcloud beta dns --project=fluted-lambda-274409 record-sets transaction start --zone="tanzu4u"
+  gcloud beta dns --project=fluted-lambda-274409 record-sets transaction add "EXT_IP_ADDRESS" --name="tap-gui.tap.tanzu4u.net." --ttl="300" --type="A" --zone="tanzu4u"
+  gcloud beta dns --project=fluted-lambda-274409 record-sets transaction execute --zone="tanzu4u"
+  ```
+  - Configure contour for ingress
+  > Note: Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/tap-ingress/values-ingress.yaml">values-ingress.yaml</a> located in tap-ingress folder.
+  ```bash
+  cd tap-ingress
+  ./configure-ingress.sh values-ingress.yaml
+  ```
+  - Verify TAP GUI is installed and can be accessed.
+  ```bash
+  nslookup tap-gui.tap.tanzu4u.net
+  open -a "Google Chrome" https://tap-gui.tap.tanzu4u.net
+  ```
+- Deploy a sample application
+  
+  - Create a Tanzu workload for tanzu-java-web-app.
+  ```bash
+  tanzu apps workload create tanzu-java-web-app \
+  --git-repo https://github.com/sreeramsunkara/tanzu-java-web-app \
+  --git-branch main \
+  --type web \
+  --label app.kubernetes.io/part-of=tanzu-java-web-app \
+  --namespace dev \
+  --yes
+  ``` 
+  - Check the status of the tanzu-java-web-app.
+  ```bash
+  tanzu apps workload get tanzu-java-web-app -n dev
+  ```
+  - If using custom domain, create the DNS record for the apps.
+  ```bash
+  gcloud beta dns --project=fluted-lambda-274409 record-sets transaction start --zone="tanzu4u"
+  gcloud beta dns --project=fluted-lambda-274409 record-sets transaction add EXT_IP_ADDRESS --name="*.apps.tap.tanzu4u.net." --ttl="300" --type="A" --zone="tanzu4u"
+  gcloud beta dns --project=fluted-lambda-274409 record-sets transaction execute --zone="tanzu4u"
+  ```
+  > Note: If there is no custom domain, then you will need to create alias and use the hosts file.
+  - Access the app to verify.
+  ```bash
+  open -a "Google Chrome" https://tanzu-java-web-app-dev.apps.tap.tanzu4u.net/
+  ```
+
+## Postgres Operator Installation
+
 ## Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipyn</a> to install Postgres Operator on TAP following the instructions.
 # Deploy Spring Petclinic App and bind to Postgres database
 ## Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipyn</a> to install Postgres Operator on TAP following the instructions.
