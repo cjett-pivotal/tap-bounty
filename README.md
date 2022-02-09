@@ -68,7 +68,7 @@
   ```
   - Install the kapp CLI onto your $PATH:
   ```bash
-  sudo cp $HOME/tanzu-cluster-essentials/kapp /usr/local/bin/kapp
+  cp $HOME/tanzu-cluster-essentials/kapp /usr/local/bin/kapp
   ```
 - Install or update the Tanzu CLI and plug-ins
   - Follow the instructions provided in the VMware Documentation to install <a href="https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#install-or-update-the-tanzu-cli-and-plugins-2">Tanzu CLI and plug-ins</a>
