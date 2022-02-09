@@ -8,7 +8,7 @@
 
 ## TAP Installation on GKE
 ### Prerequisites:
-- Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install)
+- Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install) and [initialize](https://cloud.google.com/sdk/docs/initializing)
 >Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install-prerequistes.ipynb">jupyter/tap-install-prerequisites.ipynb</a> to install prerequisites for installing TAP.
 > If you are unable to run notebook, follow the instructions below.
 - GKE Cluster with the following configuration:
