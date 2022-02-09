@@ -76,7 +76,7 @@
 ### Installing Tanzu Application Platform:
 >Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipynb</a> to install Tanzu Application Platform.
 > If you are unable to run notebook, follow the instructions below.
-- Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/install/scripts/setUp.sh">setUp.sh</a> and update values forI INSTALL_REGISTRY_HOSTNAME, INSTALL_REGISTRY_USERNAME, INSTALL_REGISTRY_PASSWORD, CERTS_DIR, SA_PWD_FILE
+- Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/install/scripts/setUp.sh">setUp.sh</a> in the `/install/scripts` directory and update values for INSTALL_REGISTRY_HOSTNAME, INSTALL_REGISTRY_USERNAME, INSTALL_REGISTRY_PASSWORD, CERTS_DIR, SA_PWD_FILE
 
   - INSTALL_REGISTRY_HOSTNAME - registry.tanzu.vmware.com
   - INSTALL_REGISTRY_USERNAME - your Tanzu registry username
