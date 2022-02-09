@@ -18,7 +18,7 @@
   - disk-size "100"
   - num-nodes "3"
 
-  For example, use the command below to create a GKE cluster.  
+  For example, use the command below to create a GKE cluster in the `us-central1-c` region.
   - Replace `PROJECT_ID` with a valid project name.  
   - Valid project names can be found via `gcloud projects list` or at [https://console.cloud.google.com/](https://console.cloud.google.com/)
   - Note there are 3 PROJECT_ID values that need to be replaced
