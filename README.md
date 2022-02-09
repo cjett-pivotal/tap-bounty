@@ -161,8 +161,75 @@
   open -a "Google Chrome" https://tanzu-java-web-app-dev.apps.tap.tanzu4u.net/
   ```
 
-## Postgres Operator Installation
+## Postgres Installation
+### Installing Postgres Operator on TAP
+>Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-postgres.ipynb">jupyter/tap-postgres.ipynb</a> to install Tanzu Application Platform.
+> If you are unable to run notebook, follow the instructions below.
+- Install Helm using homebrew
+  ```bash
+  brew install helm
+  ```
+- Edit prereq.sh and update TANZU_NETWORK_USERNAME and TANZU_NETWORK_PASSWORD for Tanzu Network Registry.
+  ```bash
+  cd $HOME/projects/tap-bounty/postgres
+  chmod 755 prereq.sh
+  ./prereq.sh
+  ```
+- Install Postgres Operator based on values provided in postgres-operator/values.yaml
+  ```bash
+  cat postgres-operator/values.yaml
+  ./install-operator.sh
+  helm list -n postgres-operator
+  ```
+### Create Postgres instance in "dev" namespace for use by applications
+- Verify ALLOWVOLUMEEXPANSION and VOLUMEBINDINGMODE for available Storage Classes
+> Note: Ensure that the storage class VOLUMEBINDINGMODE field is set to volumeBindingMode=WaitForFirstConsumer, to avoid Postgres pods and Persistent Volumes (PV) scheduling issues.
+  ```bash
+  kubectl get storageclasses
+  ```
+- Deploy a Postgres instance
+> Note: Edit install-instance.sh and update TANZU_NETWORK_USERNAME and TANZU_NETWORK_PASSWORD for Tanzu Network Registry.
+> Review and update postgres.yaml and postgres-service-binding-rbac.yaml for any customizations.
+  ```bash
+  ./install-instance.sh
+  ```
+- Verify Postgres instance is created successfully
+  ```bash
+  kubectl get postgres/postgres-db -n dev
+  ```
 
-## Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipyn</a> to install Postgres Operator on TAP following the instructions.
-# Deploy Spring Petclinic App and bind to Postgres database
-## Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipyn</a> to install Postgres Operator on TAP following the instructions.
+## Deploy Spring Petclinic with Postgres using Service Binding
+
+> Note: Checkout the project https://github.com/sreeramsunkara/spring-petclinic-tap.
+Ensure spring.datasource.initialization-mode=always in application.properties and application-postgres.properties to create the schema and data .
+For subsequent runs set spring.datasource.initialization-mode=never.
+> 
+> Update kubernetes/tap/workload.yaml to update the GIT uri for source code.
+- Deploy Spring Petclinic workload
+  ```bash
+  cd $HOME/projects/tap/spring-petclinic-tap
+  tanzu apps workload apply -f kubernetes/tap/workload.yaml -y
+  ```
+> Note: Review the workload.yaml to see service claims for Postgres instance created.
+- Verify Spring Petclinic workload is created and running successfully
+  ```bash
+  tanzu apps workload get spring-petclinic -n dev
+  ```
+- Access the Petclinic app
+  ```bash
+  open -a "Google Chrome" https://spring-petclinic-dev.apps.tap.tanzu4u.net/
+  ```
+- Connect to Postgres DB and verify data
+  ```bash
+  kubectl exec -n dev -it postgres-db-0 -- bash -c "psql -U pgappuser -d postgres-db"
+  ```
+  > Note: The above command logs you in to the Postgres DB. You can execute psql to query the database and can quit using \q.
+  ```bash
+  select * from vets;
+  \q
+  ```
+>Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-spring-petclinic-postgres.ipynb">jupyter/tap-spring-petclinic-postgres.ipynb</a> to install Tanzu Application Platform.
+> If you are unable to run notebook, follow the instructions below.
+
+### Tanzu Application Platform Documentation is available <a href="https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-intro.html">here</a>
+### Postgres Installation Documentation is available <a href="https://docs.vmware.com/en/VMware-Tanzu-SQL-with-Postgres-for-Kubernetes/1.5/tanzu-postgres-k8s/GUID-install-operator.html">here</a>
