@@ -54,7 +54,7 @@
   pivnet login --api-token='PIVNET_TOKEN'
   pivnet download-product-files --product-slug='tanzu-cluster-essentials' --release-version='1.0.0' --product-file-id=1105820
   ```
-  - Configure and run install.sh
+  - Configure and run install.sh.  Note: `INSTALL_REGISTRY_USERNAME` and `INSTALL_REGISTRY_PASSWORD` are the same as your [Tanzu Network](https://network.pivotal.io/) login.
   ```bash
   mkdir $HOME/tanzu-cluster-essentials
   tar -xvf tanzu-cluster-essentials-darwin-amd64-1.0.0.tgz -C $HOME/tanzu-cluster-essentials
