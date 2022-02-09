@@ -8,6 +8,7 @@
 
 ## TAP Installation on GKE
 ### Prerequisites:
+- Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install) and [initialize](https://cloud.google.com/sdk/docs/initializing)
 >Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install-prerequistes.ipynb">jupyter/tap-install-prerequisites.ipynb</a> to install prerequisites for installing TAP.
 > If you are unable to run notebook, follow the instructions below.
 - GKE Cluster with the following configuration:
@@ -17,9 +18,23 @@
   - disk-size "100"
   - num-nodes "3"
 
-  For example, use the command below to create a GKE cluster.  
+  For example, use the command below to create a GKE cluster in the `us-central1-c` region.
+  - Replace `PROJECT_ID` with a valid project name.  
+  - Valid project names can be found via `gcloud projects list` or at [https://console.cloud.google.com/](https://console.cloud.google.com/)
+  - Note there are 3 PROJECT_ID values that need to be replaced
+    - `project`
+      - This is the main name of your project.
+    - `network`
+      - The network used for the GKE cluster.  
+      - Set to use the `default` network `projects/PROJECT_ID/global/networks/default`.  
+      - Valid networks can be found via `gcloud compute networks list`
+    - `subnetwork`
+      - The subnetwork used for the GKE cluster.  
+      - Set to use the `default` subnetwork `projects/PROJECT_ID/regions/us-central1/subnetworks/default`.  
+      - Valid subnetworks can be found via `gcloud compute networks subnets list`
+
   ```bash
-  gcloud beta container --project "PROJECT_ID" clusters create "tap-gke-cluster" --zone "us-central1-c" --no-enable-basic-auth --cluster-version "1.21.6-gke.1500" --release-channel "regular" --machine-type "e2-standard-4" --image-type "COS_CONTAINERD" --disk-type "pd-standard" --disk-size "100" --metadata disable-legacy-endpoints=true --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" --max-pods-per-node "110" --num-nodes "3" --logging=SYSTEM,WORKLOAD --monitoring=SYSTEM --enable-ip-alias --network "projects/fluted-lambda-274409/global/networks/default" --subnetwork "projects/fluted-lambda-274409/regions/us-central1/subnetworks/default" --no-enable-intra-node-visibility --default-max-pods-per-node "110" --no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 --enable-shielded-nodes --node-locations "us-central1-c"
+  gcloud beta container --project "PROJECT_ID" clusters create "tap-gke-cluster" --zone "us-central1-c" --no-enable-basic-auth --cluster-version "1.21.6-gke.1500" --release-channel "regular" --machine-type "e2-standard-4" --image-type "COS_CONTAINERD" --disk-type "pd-standard" --disk-size "100" --metadata disable-legacy-endpoints=true --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" --max-pods-per-node "110" --num-nodes "3" --logging=SYSTEM,WORKLOAD --monitoring=SYSTEM --enable-ip-alias --network "projects/PROJECT_ID/global/networks/default" --subnetwork "projects/PROJECT_ID/regions/us-central1/subnetworks/default" --no-enable-intra-node-visibility --default-max-pods-per-node "110" --no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 --enable-shielded-nodes --node-locations "us-central1-c"
   ```
   >Note: GKE zonal clusters come with 1 instance of control plane that can struggle with TAP installation. In order to overcome the problem, you may have to delete and reinstall TAP in case of Control Plane and Cluster failures.
   > Google recommends using a Regional cluster, however a Zonal cluster will work fine after the initial hick ups.
@@ -29,8 +44,8 @@
   gcloud container clusters get-credentials tap-gke-cluster --zone us-central1-c --project "PROJECT_ID"
   ```
 - Install Cluster Essentials for VMWare Tanzu
-  - Sign in to Tanzu Network.
-  - Navigate to Cluster Essentials for VMware Tanzu on Tanzu Network.
+  - Sign in to [Tanzu Network](https://network.pivotal.io/).
+  - Navigate to [Cluster Essentials for VMware Tanzu](https://network.pivotal.io/products/tanzu-cluster-essentials) on Tanzu Network.
   - Download tanzu-cluster-essentials-darwin-amd64-1.0.0.tgz (for OS X) or tanzu-cluster-essentials-linux-amd64-1.0.0.tgz (for Linux) and unpack the TAR file into tanzu-cluster-essentials directory:
   
   To download using <a href= "https://github.com/pivotal-cf/pivnet-cli">pivnet CLI</a>, please install it and use your pivnet token.
@@ -39,7 +54,8 @@
   pivnet login --api-token='PIVNET_TOKEN'
   pivnet download-product-files --product-slug='tanzu-cluster-essentials' --release-version='1.0.0' --product-file-id=1105820
   ```
-  - Configure and run install.sh
+  - Configure and run install.sh.  
+    - Note: `INSTALL_REGISTRY_USERNAME` and `INSTALL_REGISTRY_PASSWORD` are the same as your [Tanzu Network](https://network.pivotal.io/) login.
   ```bash
   mkdir $HOME/tanzu-cluster-essentials
   tar -xvf tanzu-cluster-essentials-darwin-amd64-1.0.0.tgz -C $HOME/tanzu-cluster-essentials
@@ -52,7 +68,7 @@
   ```
   - Install the kapp CLI onto your $PATH:
   ```bash
-  sudo cp $HOME/tanzu-cluster-essentials/kapp /usr/local/bin/kapp
+  cp $HOME/tanzu-cluster-essentials/kapp /usr/local/bin/kapp
   ```
 - Install or update the Tanzu CLI and plug-ins
   - Follow the instructions provided in the VMware Documentation to install <a href="https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#install-or-update-the-tanzu-cli-and-plugins-2">Tanzu CLI and plug-ins</a>
@@ -60,7 +76,7 @@
 ### Installing Tanzu Application Platform:
 >Note: Use the jupyter notebook <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/jupyter/tap-install.ipynb">jupyter/tap-install.ipynb</a> to install Tanzu Application Platform.
 > If you are unable to run notebook, follow the instructions below.
-- Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/install/scripts/setUp.sh">setUp.sh</a> and update values forI INSTALL_REGISTRY_HOSTNAME, INSTALL_REGISTRY_USERNAME, INSTALL_REGISTRY_PASSWORD, CERTS_DIR, SA_PWD_FILE
+- Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/install/scripts/setUp.sh">setUp.sh</a> in the `/install/scripts` directory and update values for INSTALL_REGISTRY_HOSTNAME, INSTALL_REGISTRY_USERNAME, INSTALL_REGISTRY_PASSWORD, CERTS_DIR, SA_PWD_FILE
 
   - INSTALL_REGISTRY_HOSTNAME - registry.tanzu.vmware.com
   - INSTALL_REGISTRY_USERNAME - your Tanzu registry username
