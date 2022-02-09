@@ -44,8 +44,8 @@
   gcloud container clusters get-credentials tap-gke-cluster --zone us-central1-c --project "PROJECT_ID"
   ```
 - Install Cluster Essentials for VMWare Tanzu
-  - Sign in to Tanzu Network.
-  - Navigate to Cluster Essentials for VMware Tanzu on Tanzu Network.
+  - Sign in to [Tanzu Network](https://network.pivotal.io/).
+  - Navigate to [Cluster Essentials for VMware Tanzu](https://network.pivotal.io/products/tanzu-cluster-essentials) on Tanzu Network.
   - Download tanzu-cluster-essentials-darwin-amd64-1.0.0.tgz (for OS X) or tanzu-cluster-essentials-linux-amd64-1.0.0.tgz (for Linux) and unpack the TAR file into tanzu-cluster-essentials directory:
   
   To download using <a href= "https://github.com/pivotal-cf/pivnet-cli">pivnet CLI</a>, please install it and use your pivnet token.
