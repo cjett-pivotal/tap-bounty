@@ -81,7 +81,10 @@
   - INSTALL_REGISTRY_HOSTNAME - registry.tanzu.vmware.com
   - INSTALL_REGISTRY_USERNAME - your Tanzu registry username
   - INSTALL_REGISTRY_PASSWORD - your Tanzu registry password
-  - CERTS_DIR - the directory that holds the ssl certs(public and private keys) in .pem format to use in configuring SSL for ingress.
+    - CERTS_DIR - the directory that holds the ssl certs(public and private keys) in .pem format to use in configuring SSL for ingress.
+      > Note: Use <a href="https://certbot-dns-google.readthedocs.io/en/stable/">certbot for google dns</a> to obtain ssl certs for your domain from Letsengcrypt with the command below. 
+       
+      >"sudo certbot certonly  --dns-google --dns-google-credentials SERVICE_ACCOUNT_JSON"
   - SA_PWD_FILE - your GCP Service Account key in json format in a file.
 
   ```bash
