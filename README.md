@@ -87,8 +87,11 @@
   ```bash
   cd $HOME/projects/tap-bounty/install/scripts
   chmod 755 setUp.sh
-  cd $HOME/projects/tap-bounty
   ```
+- Run the setUp.sh script
+  - `./setUp.sh`
+- Change your working directory back to the `tap-bounty` directory
+  `cd $HOME/projects/tap-bounty`
   - Edit <a href="https://github.com/sreeramsunkara/tap-bounty/blob/main/tap-values.yml">tap-values.yml</a> to update the values for GCR_REPOSITORY, SERVICE_ACCOUNT_JSON, TANZU_NETWORK_USERNAME, TANZU_NETWORK_PASSWORD, GITHUB_TOKEN and the domain values.
   
     - GCR_REPOSITORY - gcr.io/PROJECT_ID/REPO_NAME
